@@ -60,7 +60,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
     PokedexAdapter(Context context) {
         requestQueue = Volley.newRequestQueue(context);
         loadPokemon();
-        allPokemonList = new ArrayList<>(pokemonList);
+
 
     }
 
@@ -81,6 +81,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
                     }
 
                     notifyDataSetChanged();
+                    allPokemonList = new ArrayList<>(pokemonList);
                 } catch (JSONException e) {
                     Log.e("cs50", "Json error", e);
                 }
@@ -122,6 +123,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
     }
 
     private class PokemonFilter extends Filter{
+
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Pokemon> filteredList = new ArrayList<>();
@@ -143,7 +145,10 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-
+            pokemonList.clear();
+            pokemonList.addAll((List<Pokemon>)results.values);
+            notifyDataSetChanged();
         }
     }
+
 }
