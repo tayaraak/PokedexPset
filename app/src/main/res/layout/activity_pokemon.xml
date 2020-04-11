@@ -34,6 +34,11 @@
         android:textAlignment="center"
         android:textSize="16dp"
         android:paddingTop="5dp" />
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
