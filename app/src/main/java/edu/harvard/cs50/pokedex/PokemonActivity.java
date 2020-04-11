@@ -1,10 +1,13 @@
 package edu.harvard.cs50.pokedex;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,8 +25,12 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView numberTextView;
     private TextView type1TextView;
     private TextView type2TextView;
+    private Button coughtButton;
     private String url;
     private RequestQueue requestQueue;
+    private boolean isCaught;
+    private String pokemonName;
+    public static final String SHARED_PREFS = "sharedPrefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +38,23 @@ public class PokemonActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pokemon);
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+
         url = getIntent().getStringExtra("url");
+        pokemonName = getIntent().getStringExtra("name");
+
         nameTextView = findViewById(R.id.pokemon_name);
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+        coughtButton = findViewById(R.id.button_catch);
 
         load();
+        loadData();
+        if (isCaught){
+            coughtButton.setText("Release");
+        }else{
+            coughtButton.setText("Catch");
+        }
     }
 
     public void load() {
@@ -77,4 +94,33 @@ public class PokemonActivity extends AppCompatActivity {
 
         requestQueue.add(request);
     }
+    public void toggleCatch(View v){
+        if (isCaught){
+            isCaught = false;
+            coughtButton.setText("Catch");
+        } else {
+            isCaught = true;
+            coughtButton.setText("Release");
+        }
+    }
+
+    public void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(pokemonName, isCaught);
+        editor.apply();
+    }
+    public void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        isCaught = sharedPreferences.getBoolean(pokemonName, false);
+
+    }
+
+    @Override
+    protected void onPause()
+    {   super.onPause();
+        saveData();
+    }
+
+
 }

@@ -34,4 +34,12 @@
         android:textAlignment="center"
         android:textSize="16dp"
         android:paddingTop="5dp" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Catch"
+        android:onClick="toggleCatch"
+        android:id="@+id/button_catch"
+        android:layout_gravity="center_horizontal"/>
+
 </LinearLayout>
