@@ -32,6 +32,7 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView numberTextView;
     private TextView type1TextView;
     private TextView type2TextView;
+    private TextView infoTextView;
     private ImageView imageView;
     private Button coughtButton;
     private String url;
@@ -55,11 +56,13 @@ public class PokemonActivity extends AppCompatActivity {
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+        infoTextView = findViewById(R.id.info_text_view);
         imageView = findViewById(R.id.image_view);
         coughtButton = findViewById(R.id.button_catch);
 
         load();
         loadData();
+
         if (isCaught){
             coughtButton.setText("Release");
         }else{
@@ -78,6 +81,11 @@ public class PokemonActivity extends AppCompatActivity {
                 try {
                     nameTextView.setText(response.getString("name"));
                     numberTextView.setText(String.format("#%03d", response.getInt("id")));
+
+                    String infoUrl = "https://pokeapi.co/api/v2/pokemon-species/"+response.getInt("id");
+                    loadInfo(infoUrl);
+
+                    Log.d("getting info", "onResponse: ifoUrl is: "+ infoUrl);
 
                     JSONArray typeEntries = response.getJSONArray("types");
 
@@ -108,7 +116,6 @@ public class PokemonActivity extends AppCompatActivity {
                 Log.e("cs50", "Pokemon details error", error);
             }
         });
-
         requestQueue.add(request);
 
     }
@@ -131,7 +138,6 @@ public class PokemonActivity extends AppCompatActivity {
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         isCaught = sharedPreferences.getBoolean(pokemonName, false);
-
     }
 
     @Override
@@ -157,6 +163,39 @@ public class PokemonActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             imageView.setImageBitmap(bitmap);
         }
+    }
+
+
+    public void loadInfo(String infoUrl){
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, infoUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray flavorTextEntries = response.getJSONArray("flavor_text_entries");
+                    for (int i = 0; i < flavorTextEntries.length(); i++){
+                        JSONObject entry = flavorTextEntries.getJSONObject(i);
+                        JSONObject language = entry.getJSONObject("language");
+                        String langName = language.getString("name");
+                        if (langName.equals("en")){
+                            String infoText = entry.getString("flavor_text");
+                            infoTextView.setText(infoText);
+                            break;
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    Log.e("cs50", "Pokemon info json error", e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("cs50", "Pokemon info details error", error);
+            }
+        });
+
+        requestQueue.add(request);
+
     }
 
 
